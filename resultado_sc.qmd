@@ -38,7 +38,7 @@ df.bcb <- gbcbd_get_series(id = my.id ,
 glimpse(df.bcb)
 ```
 
-## Fluxo acumulado no ano
+## Variável
 
 O Resultado Primário do Governo do Estado de SC - Fluxo acumulado no ano é um indicador crucial. Ele mostra se o governo de Santa Catarina, ao longo do ano, está conseguindo gerar mais receitas (tudo que arrecada, como impostos) do que despesas (tudo que gasta, como salários e investimentos), excluindo os juros da dívida pública.
 
