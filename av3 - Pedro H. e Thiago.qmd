@@ -1,0 +1,124 @@
+---
+title: "Despesa com Saúde Pública Mundial (% do PIB)"
+format: html
+editor: visual
+subtitle: "Grupo: Pedro Harael e Thiago Henrique"
+---
+
+<style>
+  p {
+    text-align: justify;
+  }
+</style>
+---
+
+```{r}
+#| label: setup-packages
+#| message: false
+#| warning: false
+#| echo: false
+
+library(WDI)
+library(ggthemes)
+library(knitr)
+library(kableExtra)
+library(rnaturalearth)
+library(tidyverse)
+library(ggrepel)
+library(gganimate)
+library(transformr)
+library(extrafont)
+```
+
+## Gráfico Animado da Despesa com Saúde Pública
+
+```{r}
+#| label: animated-plot
+#| message: false
+#| warning: false
+#| fig-width: 10
+#| fig-height: 8
+#| fig-align: center
+#| echo: false
+
+indicator <- c("Despesa com Saúde Pública (% do PIB)" = 'SH.XPD.GHED.GD.ZS')
+datWM9 <- WDI(indicator, country="all",start = '2000', end = '2022') 
+
+Data_info <- WDI_data 
+
+name_health_exp <- as.data.frame(Data_info$series) %>%
+  filter(indicator == "SH.XPD.GHED.GD.ZS") %>%
+  select(name) %>%
+  pull() 
+
+source_health_exp <- as.data.frame(Data_info$series) %>%
+  filter(indicator == "SH.XPD.GHED.GD.ZS") %>%
+  select(sourceOrganization) %>%
+  pull()
+
+title_graph_pt <- "Despesa com Saúde Pública (% do PIB)"
+
+source_abnt <- paste0("Fonte: WORLD BANK. World Development Indicators. Disponível em: ", 
+                      "[https://databank.worldbank.org/source/world-development-indicators](https://databank.worldbank.org/source/world-development-indicators)", 
+                      ". Acesso em: 09 jun. 2025.") 
+
+modern_font <- "Roboto Condensed" 
+
+animated_plot <- ne_countries(returnclass = "sf") %>%
+  left_join(datWM9, c("iso_a2" = "iso2c")) %>%
+  filter(iso_a2 != "ATA") %>% 
+  ggplot(aes(fill = `Despesa com Saúde Pública (% do PIB)`)) + 
+  geom_sf() +
+  scale_fill_viridis_c(
+    labels = scales::percent_format(scale = 1), 
+    name = "" 
+  ) + 
+  theme(
+    plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm"), 
+
+    legend.position = "right", 
+    legend.title = element_text(angle = 90, hjust = 0.5, size = 10, family = modern_font), 
+    legend.text = element_text(size = 8, family = modern_font), 
+    legend.key.size = unit(0.5, "cm"), 
+
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold", margin = margin(b = 10), family = modern_font), 
+    
+    plot.caption = element_text(hjust = 0, size = 8, margin = margin(t = 10), family = modern_font), 
+
+    panel.background = element_rect(fill = "white", colour = NA), 
+    panel.grid.major = element_line(colour = "grey80", size = 0.2), 
+    panel.grid.minor = element_blank(),
+    
+    text = element_text(family = modern_font) 
+  ) +
+  labs(
+    title = paste0(title_graph_pt, " em {closest_state}"), 
+    fill = NULL, 
+    caption = source_abnt 
+  ) +
+  transition_states(year, transition_length = 1, state_length = 4) 
+
+animate(animated_plot, fps = 12, duration = 34.5, renderer = gifski_renderer())
+```
+
+## Análise Despesa com Saúde do Governo Geral Nacional (% do PIB)
+
+A despesa com saúde do governo geral nacional é medida como percentual do Produto Interno Bruto (PIB), constitui como um importante indicador da prioridade que os países atribuem ao financiamento público da saúde. Esse indicador é amplamente utilizado para monitorar o progresso em direção à Cobertura Universal de Saúde (CUS) e à garantia do direito à saúde, conforme pré-estabelecido na meta 3.c dos Objetivos de Desenvolvimento Sustentável (ODS).
+
+O gráfico animado do mundo apresenta a variação da Despesa com Saúde do Governo Geral Nacional (% do PIB) de vários países no período de 2000 até 2022, elaborado com base nos dados do Banco Mundial, revela grandes disparidades entre os países, enquanto as nações desenvolvidas, principalmente Estados Unidos, Canadá, Japão, Austrália e o ocidente da Europa destinavam em torno de 7% em 2000 e no final do período em 2022 essas nações estão próximas dos 10% do PIB destinados a saúde pública, muitos países de baixa e média renda, como boa parte da África e Ásia apresentam percentuais significativamente menores, abaixo de 4%, enquanto isso o Brasil se manteve praticamente estável no período com valores próximos de 4%, essas desigualdades são reflexos tanto de capacidades econômicas distintas entre os países, quanto de diferentes modelos de estados e prioridades de políticas públicas.
+
+No contexto brasileiro, essa discussão ganha contornos particulares, que embora a Constituição de 1988 tenha instituído o Sistema Único de Saúde (SUS) como política universal, o subfinanciamento crônico do sistema permanece como uma de suas maiores fragilidades. Segundo Paim (2018), apesar da abrangência normativa do SUS, a sustentação financeira efetiva nunca acompanhou sua complexidade e responsabilidades crescentes, o que compromete a qualidade e a equidade no acesso aos serviços.
+
+Além disso, conforme análise de Bahia (2020), os recursos emergenciais aplicados durante a pandemia da COVID-19 expuseram tanto a importância estratégica do SUS quanto a precariedade de seu financiamento habitual, portanto a autora argumenta que a lógica de financiamento fragmentada e insuficiente impede o fortalecimento sustentável do sistema.
+
+Indo além do âmbito da pandemia, Piola et al. (2013) apontam que o Brasil investe menos em saúde pública, em termos proporcionais, do que outros países com sistemas universais. Ainda que o gasto total com saúde seja elevado no país, grande parte desse valor provém do setor privado, o que contribui para aprofundar desigualdades de acesso.
+
+Contudo, a análise da variável de despesa com saúde do governo geral nacional (% do PIB), vai muito além de números econômico, ela expressa escolhas políticas e estruturais e o fortalecimento do financiamento público da saúde é condição indispensável para a consolidação de sistemas universais de qualidade e igualdade.
+
+## Referências
+
+PAIM, Jairnilson Silva. A Constituição Cidadã e os 30 anos do Sistema Único de Saúde (SUS). Ciência & Saúde Coletiva, v. 23, n. 6, p. 1723–1728, 2018. Disponível em: https://www.scielo.br/j/csc/a/Qg7SJFjWPjvdQjvnRzxS6Mg/. Acesso em: 18 jun. 2025.
+
+BAHIA, Ligia. Subfinanciamento crônico do SUS e pandemia: entraves ao direito à saúde no Brasil. Ciência & Saúde Coletiva, v. 25, supl. 1, p. 2415–2424, 2020. Disponível em: https://www.scielo.br/j/csp/a/6bXsfNjq8jwBhm754SNpcdx/. Acesso em: 18 jun. 2025.
+
+PIOLA, Sérgio et al. Financiamento público da saúde: uma história à procura de rumo. Ciência & Saúde Coletiva, v. 18, n. 1, p. 161–171, 2013. Disponível em: https://www.scielo.br/j/rsp/a/K8ndQvH7qmzKgFRmjvPb59L/. Acesso em: 18 jun. 2025.
